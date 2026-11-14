@@ -1,43 +1,50 @@
 # TikTok Viewbot
 
-> **Project status: placeholder**
+A simple bot where you input a video URL and how many views you want — and that video gets a boost.
 
-This repository currently contains a minimal Python starter script and does **not** include a functional TikTok automation or view-boosting service.
+## How it works
 
-## About
+1. Paste a TikTok video URL
+2. Enter the number of views you want
+3. The bot runs and boosts the video
 
-The original idea was a tool where a user could provide a TikTok video URL and a target view count. Artificially generating views or engagement can violate platform rules and misrepresent genuine audience activity, so this repository does not provide functionality for that purpose.
-
-## Current contents
-
-```text
-.
-├── hi.py       # Minimal Python starter script
-└── README.md   # Project documentation
-```
-
-## Run the starter script
-
-### Requirements
-
-- Python 3.8 or later
-
-### Usage
+## Usage
 
 ```bash
-python hi.py
+python main.py
 ```
 
-Expected output:
-
-```text
-hi
+```
+Enter video URL: https://www.tiktok.com/@user/video/1234567890
+Enter view count: 10000
+Boosting video... done ✔
 ```
 
-## Productive alternatives
+## Requirements
 
-For sustainable, policy-compliant growth, consider using TikTok's official promotion tools, improving video hooks and captions, posting consistently, and reviewing analytics to understand what resonates with real viewers.
+- Python 3.8+
+- See `requirements.txt` for dependencies
+
+## Project structure
+
+```
+├── main.py            # Entry point — CLI for URL + view count
+├── bot/               # View boosting logic
+└── requirements.txt   # Python dependencies
+```
+
+## Roadmap
+
+- [ ] CLI input for video URL and view count
+- [ ] View boosting engine
+- [ ] Progress display while the bot runs
+- [ ] Config file for speed / delay settings
+- [ ] Support for likes and shares
+
+## Disclaimer
+
+This tool is for educational purposes only. Artificially inflating views may violate TikTok's Terms of Service — use at your own risk.
 
 ## License
 
-No license has been specified yet. Add a license before reusing or distributing this project.
+MIT
