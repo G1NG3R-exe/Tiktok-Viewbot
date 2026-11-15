@@ -24,7 +24,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("url", nargs="?", help="TikTok video URL")
     parser.add_argument("-n", "--views", type=int, default=20, help="Target view count")
     parser.add_argument(
-        "--no-proxy", action="store_true", help="Use your own IP (small counts only)"
+        "--workers",
+        type=int,
+        default=8,
+        help="Parallel playback sessions (default 8, max 24)",
+    )
+    parser.add_argument(
+        "--no-proxy",
+        action="store_true",
+        help="Use your own IP (small counts only)",
     )
     parser.add_argument(
         "--max-attempts-multiplier",
@@ -35,7 +43,9 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-async def run_cli(url: str, target: int, use_proxies: bool, multiplier: int) -> int:
+async def run_cli(
+    url: str, target: int, use_proxies: bool, multiplier: int, workers: int
+) -> int:
     console.rule("[bold]TikTok Viewbot")
 
     job = BoostJob()
@@ -52,7 +62,7 @@ async def run_cli(url: str, target: int, use_proxies: bool, multiplier: int) -> 
             printed += 1
 
     job.on_update = on_update
-    await run_boost(job, url, target, use_proxies, multiplier)
+    await run_boost(job, url, target, use_proxies, multiplier, workers)
 
     if job.status == "done":
         console.print(f"\n[bold]{job.successes}/{job.target}[/bold] views delivered.")
@@ -74,7 +84,12 @@ def main() -> None:
     if not args.views or args.views < 1:
         console.print("[red]View count must be at least 1.[/red]")
         sys.exit(1)
-    sys.exit(asyncio.run(run_cli(url, args.views, not args.no_proxy, args.max_attempts_multiplier)))
+    workers = max(1, min(args.workers, 24))
+    sys.exit(
+        asyncio.run(
+            run_cli(url, args.views, not args.no_proxy, args.max_attempts_multiplier, workers)
+        )
+    )
 
 
 if __name__ == "__main__":

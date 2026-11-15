@@ -20,7 +20,7 @@ No paid services, no API keys, no accounts — everything runs free on your mach
 1. **Input** — paste a TikTok video URL (short links like `vm.tiktok.com` work too) and a target view count
 2. **Baseline** — the bot reads the video's current public view count
 3. **Proxies** — it pulls batches of free public proxies, health-checks each one against TikTok, and keeps only the working IPs
-4. **Playback** — each view is a fresh headless-browser session on a fresh IP: the page loads, the video autoplays muted for a randomized 5–10 seconds
+4. **Playback** — each view is a fresh headless-browser session on a fresh IP: it opens TikTok's lightweight embed player, which autoplays muted for a randomized 5–10 seconds. A proxy that fails twice is retired; when every proxy is dead, the bot falls back to your own IP instead of giving up.
 5. **Result** — TikTok's public count updates on its own lag (typically 10–60 minutes), so check the delta afterwards
 
 TikTok deduplicates views per IP and session — that's why rotating proxies are the core of the design, and why one IP refreshing in a loop doesn't work.
@@ -46,8 +46,9 @@ python main.py "https://www.tiktok.com/@user/video/1234567890" -n 50
 | Flag | Description |
 |---|---|
 | `-n, --views` | Target view count (default 20) |
+| `--workers` | Parallel sessions (default 8, capped at 24) |
 | `--no-proxy` | Use your own IP — fine for a handful of views; TikTok dedupes repeat views per IP |
-| `--max-attempts-multiplier` | Failed-attempt budget per requested view (default 4) |
+| `--max-attempts-multiplier` | Failed-attempt budget per requested view (default 4, floor of 20 attempts) |
 
 ## Architecture
 
@@ -91,8 +92,8 @@ python main.py "https://www.tiktok.com/@user/video/1234567890" -n 50
 
 ## Expectations & limits
 
-- **Free proxies are rough.** Public lists run 50–80% dead at any moment; the bot health-checks before use and retries failures, but expect a mixed success rate.
-- **Throughput:** ~8–12s per attempt, sequential in this phase — roughly 3–5 views per minute depending on proxy luck. Scale comes in Phase 2 (concurrent workers + proxy pool management).
+- **Free proxies are rough.** Public lists run 50–80% dead at any moment; the bot health-checks before use, retries failures, and falls back to your own IP once they're exhausted. Speed is limited mostly by proxy quality, not worker count.
+- **Throughput:** ~8–12s per attempt, now **8 in parallel** by default. Expect roughly 20–40 views/min when proxies are healthy; raise `--workers` (max 24) for more, at the cost of RAM. Scale beyond that comes in Phase 2 (worker pool + proxy cooldown tracking).
 - **View-count lag:** TikTok aggregates counts server-side. The dashboard tracks *delivered attempts*; the public number catches up later.
 - **Swap proxies anytime:** paid residential proxies plug into `bot/proxies.py` without touching anything else — the rest of the code is proxy-source agnostic.
 

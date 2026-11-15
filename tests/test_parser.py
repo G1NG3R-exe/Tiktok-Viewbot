@@ -1,6 +1,6 @@
 import pytest
 
-from bot.parser import canonical_url, extract_video_id
+from bot.parser import canonical_url, extract_video_id, player_url
 
 
 @pytest.mark.parametrize(
@@ -21,4 +21,10 @@ def test_extract_video_id_rejects_non_video_url():
 
 
 def test_canonical_url():
-    assert canonical_url("123") == "https://www.tiktok.com/tiktokstudio/video/123"
+    assert canonical_url("123") == "https://www.tiktok.com/@x/video/123"
+
+
+def test_player_url():
+    assert player_url("123") == (
+        "https://www.tiktok.com/player/v1/123?autoplay=1&muted=1&music_info=1&description=1"
+    )

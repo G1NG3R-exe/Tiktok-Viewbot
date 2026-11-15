@@ -21,8 +21,21 @@ def extract_video_id(url: str) -> str:
 
 
 def canonical_url(video_id: str) -> str:
-    """Build the canonical web URL for a video ID."""
-    return f"https://www.tiktok.com/tiktokstudio/video/{video_id}"
+    """Build a canonical web URL for a video ID.
+
+    The username segment is cosmetic; `@x` avoids needing the author and keeps
+    us off `/tiktokstudio/`, whose page embeds a different (wrong) play count.
+    """
+    return f"https://www.tiktok.com/@x/video/{video_id}"
+
+
+def player_url(video_id: str) -> str:
+    """Lightweight official embed player — far easier to load through a proxy
+    than the full video page."""
+    return (
+        f"https://www.tiktok.com/player/v1/{video_id}"
+        "?autoplay=1&muted=1&music_info=1&description=1"
+    )
 
 
 async def resolve_url(url: str) -> str:

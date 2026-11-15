@@ -28,6 +28,7 @@ class StartRequest(BaseModel):
     url: str
     views: int = 20
     use_proxies: bool = True
+    workers: int = 8
 
 
 @app.post("/api/start")
@@ -42,9 +43,10 @@ async def start_job(req: StartRequest) -> dict:
         raise HTTPException(status_code=400, detail="View count must be at least 1")
     if req.views > 100_000:
         raise HTTPException(status_code=400, detail="Keep targets under 100,000 views")
+    workers = max(1, min(req.workers, 24))
 
     job.reset()
-    task = asyncio.create_task(run_boost(job, url, req.views, req.use_proxies))
+    task = asyncio.create_task(run_boost(job, url, req.views, req.use_proxies, workers=workers))
     return {"ok": True}
 
 

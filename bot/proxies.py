@@ -25,6 +25,7 @@ MAX_CANDIDATES = 300
 MAX_WORKING = 50
 CHECK_CONCURRENCY = 50
 CHECK_TIMEOUT = 10
+PROBE_URL = "https://www.tiktok.com/oembed?url=https://www.tiktok.com/@x/video/7704552985422073119"
 
 
 def _normalize(line: str) -> str | None:
@@ -64,33 +65,35 @@ async def fetch_candidates() -> list[str]:
     return candidates[:MAX_CANDIDATES]
 
 
-async def _check(proxy: str, semaphore: asyncio.Semaphore) -> str | None:
-    """A proxy 'works' if it can fetch tiktok.com over HTTPS.
+async def _check(proxy: str, semaphore: asyncio.Semaphore, probe_url: str) -> str | None:
+    """A proxy 'works' if it can fetch TikTok over HTTPS.
 
-    The proxy is bound to the client rather than the request: httpx only
-    accepts `proxy=` when building a client, not on `client.get()`.
+    The homepage alone is too weak a signal — most proxies that pass it still
+    choke on a video page — so the probe is a small oembed request instead.
     """
     async with semaphore:
         try:
             async with httpx.AsyncClient(
                 proxy=f"http://{proxy}", timeout=CHECK_TIMEOUT, follow_redirects=True
             ) as client:
-                response = await client.get("https://www.tiktok.com/")
-            if response.status_code == 200:
+                response = await client.get(probe_url)
+            if response.status_code == 200 and '"type":"video"' in response.text:
                 return proxy
         except httpx.HTTPError:
             pass
     return None
 
 
-async def get_working_proxies(limit: int = MAX_WORKING) -> list[str]:
+async def get_working_proxies(limit: int = MAX_WORKING, probe_url: str = PROBE_URL) -> list[str]:
     """Fetch candidates and return up to `limit` verified-working proxies."""
     candidates = await fetch_candidates()
     if not candidates:
         return []
 
     semaphore = asyncio.Semaphore(CHECK_CONCURRENCY)
-    results = await asyncio.gather(*(_check(proxy, semaphore) for proxy in candidates))
+    results = await asyncio.gather(
+        *(_check(proxy, semaphore, probe_url) for proxy in candidates)
+    )
 
     working = [proxy for proxy in results if proxy]
     random.shuffle(working)

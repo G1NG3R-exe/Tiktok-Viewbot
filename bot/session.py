@@ -56,6 +56,7 @@ async def watch_once(
     """
     started = time.monotonic()
     width, height = random.choice(VIEWPORTS)
+    page = None
 
     try:
         page = await page_factory(
@@ -66,16 +67,32 @@ async def watch_once(
         )
         await page.goto(video_url, timeout=45_000, wait_until="domcontentloaded")
 
-        # Make sure the video element exists and starts playing, muted.
+        # The player is rendered client-side; wait for a <video> to exist.
         try:
-            await page.evaluate(
-                """() => {
-                    const v = document.querySelector('video');
-                    if (v) { v.muted = true; v.play().catch(() => {}); }
-                }"""
-            )
+            await page.wait_for_selector("video", timeout=20_000)
         except Exception:
             pass
+
+        # Start the first video muted. Retry briefly — it can appear late.
+        for _ in range(3):
+            try:
+                await page.evaluate(
+                    """() => {
+                        const v = document.querySelector('video');
+                        if (v) { v.muted = true; v.play().catch(() => {}); }
+                    }"""
+                )
+            except Exception:
+                pass
+            await asyncio.sleep(1.0)
+            try:
+                if await page.evaluate(
+                    "() => { const v = document.querySelector('video');"
+                    " return !!v && v.currentTime > 0; }"
+                ):
+                    break
+            except Exception:
+                pass
 
         await asyncio.sleep(random.uniform(*watch_range))
 
@@ -83,10 +100,15 @@ async def watch_once(
             "() => { const v = document.querySelector('video');"
             " return !!v && v.currentTime > 0; }"
         )
-        await page.context.close()
         return AttemptResult(True, bool(played), time.monotonic() - started, proxy)
     except Exception:
         return AttemptResult(False, False, time.monotonic() - started, proxy)
+    finally:
+        if page is not None:
+            try:
+                await page.context.close()
+            except Exception:
+                pass
 
 
 async def launch_browser():
@@ -97,7 +119,10 @@ async def launch_browser():
     browser = await playwright.chromium.launch(
         headless=True,
         proxy={"server": "http://per-context"},  # placeholder, overridden per context
-        args=["--disable-blink-features=AutomationControlled"],
+        args=[
+            "--disable-blink-features=AutomationControlled",
+            "--autoplay-policy=no-user-gesture-required",
+        ],
         ignore_default_args=["--enable-automation"],
     )
     return playwright, browser

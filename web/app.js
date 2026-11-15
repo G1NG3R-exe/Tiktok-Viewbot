@@ -5,6 +5,7 @@ const $ = (sel) => document.querySelector(sel);
 const form = $("#boost-form");
 const urlInput = $("#url");
 const viewsInput = $("#views");
+const workersInput = $("#workers");
 const proxyToggle = $("#use-proxies");
 const startBtn = $("#start-btn");
 const stopBtn = $("#stop-btn");
@@ -103,6 +104,7 @@ function render(snapshot) {
   // form lock
   urlInput.disabled = busy;
   viewsInput.disabled = busy;
+  workersInput.disabled = busy;
   proxyToggle.disabled = busy;
   startBtn.disabled = busy;
 
@@ -149,6 +151,7 @@ form.addEventListener("submit", async (e) => {
   const body = {
     url: urlInput.value.trim(),
     views: parseInt(viewsInput.value, 10) || 0,
+    workers: parseInt(workersInput.value, 10) || 8,
     use_proxies: proxyToggle.checked,
   };
   if (!body.url) {
