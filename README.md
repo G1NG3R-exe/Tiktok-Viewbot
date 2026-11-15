@@ -105,6 +105,20 @@ python main.py "https://www.tiktok.com/@user/video/1234567890" -n 50
 
 See [PLAN.md](PLAN.md) for the full technical plan.
 
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest
+ruff check .
+```
+
+CI runs lint and tests on every push and pull request.
+
+## Contributing
+
+Issues and PRs are welcome. Keep changes focused, add a test where it makes sense, and run `ruff` + `pytest` before opening a PR.
+
 ## Disclaimer
 
 This project is for **educational purposes only**. Artificially inflating view counts may violate TikTok's Terms of Service and can affect a video's distribution. Use it on your own videos, at your own risk.

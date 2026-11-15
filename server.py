@@ -14,7 +14,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from bot.runner import BoostJob, TERMINAL_STATUSES, run_boost
+from bot.runner import BoostJob, run_boost
 
 WEB_DIR = Path(__file__).parent / "web"
 PORT = 8788

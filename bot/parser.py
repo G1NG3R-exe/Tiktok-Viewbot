@@ -6,7 +6,7 @@ import re
 
 import httpx
 
-VIDEO_ID_RE = re.compile(r"/video/(\d+)")
+VIDEO_ID_RE = re.compile(r"/(?:video|v)/(\d+)")
 
 
 def extract_video_id(url: str) -> str:

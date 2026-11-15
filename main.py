@@ -13,8 +13,6 @@ import sys
 from rich.console import Console
 
 from bot.runner import BoostJob, run_boost
-from bot.verify import get_view_count
-from bot.parser import canonical_url, extract_video_id, resolve_url
 
 console = Console()
 

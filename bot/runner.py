@@ -9,8 +9,8 @@ from __future__ import annotations
 import asyncio
 import random
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 from .parser import canonical_url, extract_video_id, resolve_url
 from .proxies import get_working_proxies
@@ -47,7 +47,7 @@ class BoostJob:
     finished_at: float | None = None
     stop_requested: bool = False
     log: list[dict] = field(default_factory=list)
-    on_update: Callable[["BoostJob"], None] | None = field(default=None, repr=False)
+    on_update: Callable[[BoostJob], None] | None = field(default=None, repr=False)
 
     def reset(self) -> None:
         self.status = IDLE
