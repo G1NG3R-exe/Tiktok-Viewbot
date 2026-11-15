@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viewbot — TikTok view booster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <span class="wordmark">viewbot</span>
+      <span class="pill" id="status-pill"><span class="dot"></span><span id="status-text">Ready</span></span>
+    </header>
+
+    <main>
+      <h1>Boost a TikTok video.</h1>
+      <p class="sub">
+        Paste a video link, choose how many views to add, and the bot plays it
+        through fresh proxy sessions until the target is reached.
+      </p>
+
+      <form id="boost-form" class="card">
+        <label class="field-label" for="url">Video URL</label>
+        <input
+          id="url"
+          type="url"
+          placeholder="https://www.tiktok.com/@user/video/1234567890"
+          autocomplete="off"
+          spellcheck="false"
+          required
+        />
+
+        <div class="controls">
+          <div class="views-box">
+            <label class="field-label" for="views">Views</label>
+            <input id="views" type="number" min="1" max="100000" value="20" />
+          </div>
+
+          <label class="switch-box" title="Free public proxies — turn off to use your own IP">
+            <input id="use-proxies" type="checkbox" checked />
+            <span class="switch"></span>
+            <span class="switch-label">Use free proxies</span>
+          </label>
+
+          <button id="start-btn" type="submit">Boost views</button>
+        </div>
+
+        <p id="form-error" class="form-error" hidden></p>
+      </form>
+
+      <section id="run-panel" class="card run" hidden>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value" id="stat-baseline">–</span>
+            <span class="stat-label">Baseline</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value accent" id="stat-successes">0</span>
+            <span class="stat-label">Delivered</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="stat-attempts">0</span>
+            <span class="stat-label">Attempts</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="stat-elapsed">–</span>
+            <span class="stat-label">Elapsed</span>
+          </div>
+        </div>
+
+        <div class="bar" role="progressbar" aria-label="Progress toward target views">
+          <div class="bar-fill" id="bar-fill"></div>
+        </div>
+        <p class="bar-text"><span id="bar-count">0 / 0</span> views delivered</p>
+
+        <div class="log" id="log" aria-live="polite"></div>
+
+        <div class="run-actions">
+          <button id="stop-btn" type="button" class="ghost">Stop</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Educational tool — artificial view inflation may violate TikTok's terms. Use at your own risk.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
