@@ -67,4 +67,14 @@ app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="web")
 
 if __name__ == "__main__":
     print(f"TikTok Viewbot UI  ->  http://127.0.0.1:{PORT}")
-    uvicorn.run(app, host="127.0.0.1", port=PORT, log_level="warning")
+    try:
+        uvicorn.run(app, host="127.0.0.1", port=PORT, log_level="warning")
+    except OSError as exc:
+        if "10048" in str(exc) or "only one usage" in str(exc).lower():
+            print(
+                f"Port {PORT} is already in use — the UI is probably already "
+                f"running at http://127.0.0.1:{PORT}"
+            )
+        else:
+            raise
+

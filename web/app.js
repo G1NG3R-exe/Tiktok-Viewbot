@@ -121,7 +121,7 @@ function render(snapshot) {
       : 0;
   barFill.style.width = `${pct}%`;
   bar.classList.toggle("filling", busy);
-  barCount.textContent = `${snapshot.successes} / ${snapshot.target}`;
+  barCount.textContent = `${snapshot.successes} / ${snapshot.target} views delivered`;
 
   if (snapshot.status === "done") {
     barCount.textContent = `${snapshot.successes} / ${snapshot.target} — check TikTok in 10–60 min`;
@@ -130,6 +130,7 @@ function render(snapshot) {
     barCount.textContent = snapshot.error;
   }
 
+  stopBtn.hidden = !busy;
   renderLog(snapshot.log);
 }
 
